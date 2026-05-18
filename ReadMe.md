@@ -18,8 +18,8 @@ The hyperparameter optimization successfully discovered the optimal weights for 
 ## Demonstration Output:
 
 Below are generated visuals showing the pipeline correctly performing Task 13 (Read a book) and Task 0 (Serve wine) by detecting the relevant targets.
-![Task 13 Output](file:///c:/Users/Xeron/Desktop/DVCONImplementation/Visuals/ReadBookVisual.jpg)
-![Task 0 Output](file:///c:/Users/Xeron/Desktop/DVCONImplementation/Visuals/ServeWineVisual.jpg)
+![Task 13 Output](Visuals/ReadBookVisual.jpg)
+![Task 0 Output](Visuals/ServeWineVisual.jpg)
 
 ## Project Structure:
 

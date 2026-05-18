@@ -37,5 +37,5 @@ The evaluation script measures the overall success rate of the pipeline against 
 ## Visual Output Reference:
 
 The demonstration script generates comprehensive visuals for inspection.
-![Task 13 Output](file:///c:/Users/Xeron/Desktop/DVCONImplementation/Visuals/ReadBookVisual.jpg)
-![Task 0 Output](file:///c:/Users/Xeron/Desktop/DVCONImplementation/Visuals/ServeWineVisual.jpg)
+![Task 13 Output](Visuals/ReadBookVisual.jpg)
+![Task 0 Output](Visuals/ServeWineVisual.jpg)
