@@ -1,0 +1,26 @@
+# Dataset files (too large, downloaded via SetupDataset.py)
+CocoTaskDataset/
+
+# Generated inference output cache
+output/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Editor and agent directories
+.vscode/
+.agents/
+.agent/
+.kiro/
+.claude/
+
+# Temporary shell scripts
+*.sh
+
+# YOLO training runs
+runs/
+
+# OS files
+.DS_Store
+Thumbs.db
