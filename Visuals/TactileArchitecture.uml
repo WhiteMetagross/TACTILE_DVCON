@@ -2,8 +2,10 @@
 
 skinparam backgroundColor #1e1e2e
 skinparam defaultFontName "Courier New"
-skinparam defaultFontSize 12
+skinparam defaultFontSize 11
 skinparam defaultFontColor #cdd6f4
+skinparam ArrowColor #89b4fa
+skinparam ArrowFontColor #bac2de
 
 skinparam actor {
     BackgroundColor #313244
@@ -15,13 +17,13 @@ skinparam component {
     BackgroundColor #313244
     BorderColor #89b4fa
     FontColor #cdd6f4
-    ArrowColor #89b4fa
 }
 
 skinparam package {
     BackgroundColor #181825
     BorderColor #585b70
-    FontColor #cdd6f4
+    FontColor #89b4fa
+    FontStyle bold
 }
 
 skinparam database {
@@ -36,108 +38,99 @@ skinparam note {
     FontColor #bac2de
 }
 
-title TACTILE Stage 2A — End-to-End Inference Pipeline
+title TACTILE Stage 2A -- End-to-End Inference Pipeline
 
 actor "User" as User
 
 package "Inputs" {
-    [Image (JPEG/PNG)] as Image
-    [Task ID (0-13)] as TaskId
+    component "Image\n(JPEG / PNG)" as Image
+    component "Task ID\n(integer 0..13)" as TaskId
 }
 
 package "Preprocessing" {
-    [load_image()\nResize and RGB normalize] as Preproc
-    [preprocess_for_sam()\n160x160 tensor] as PrepSam
-    [preprocess_for_yolo()\n160x160 tensor] as PrepYolo
+    component "load_image()\nResize and RGB normalize" as Preproc
+    component "preprocess_for_sam()\n160x160 float tensor" as PrepSam
+    component "preprocess_for_yolo()\n160x160 float tensor" as PrepYolo
 }
 
-package "Stage 1 — Backbone Detection" {
-    component "YOLOv5n Detector\n(YOLOv5nWrapper.py)\n\nAnchor-based, INT8-ready\n160x160 input\n75 raw proposals" as YOLO
+package "Stage 1: Backbone Detection" {
+    component "YOLOv5n Detector\n(YoloV5nWrapper.py)\nAnchor-based, INT8-ready\n160x160 input -- 75 raw proposals" as YOLO
 }
 
-package "Stage 2 — Spatial Attention" {
-    component "SAM-IP\n(SamIp.py)\n\n3-layer tiny CNN\nConv3x3 → DWConv3x3 → PW1x1\nOutputs 40x40 binary mask\n677 parameters" as SAMIP
-
-    component "Soft Gating\n(SoftGate.py)\n\nMultiplies confidence of\noff-mask proposals by alpha=0.25\nDoes NOT discard proposals" as SoftGate
+package "Stage 2: Spatial Attention" {
+    component "SAM-IP\n(SamIp.py)\nConv3x3 -> DWConv3x3 -> PW1x1\nOutputs 40x40 binary mask\n677 parameters total" as SAMIP
+    component "Soft Gating\n(SoftGate.py)\nMultiplies off-mask proposal\nconfidence by alpha=0.25" as SoftGate
 }
 
-package "Stage 3 — Feature Extraction" {
-    component "RoI Feature Extraction\n(RoiExtract.py)\n\nCrop-based spatial pooling\n128-D feature vector per proposal" as RoI
+package "Stage 3: Feature Extraction" {
+    component "RoI Feature Extraction\n(RoiExtract.py)\nCrop-based spatial pooling\n128-D vector per proposal" as RoI
 }
 
-package "Stage 4 — Task Scoring" {
-    component "Task Embedding Table\n(TaskEmb.py)\n\n14 x 128-D embeddings\nLookup by task_id" as TaskEmb
-
-    component "Task Score\n(TaskScore.py)\n\nDot product:\nproposal_feat · task_emb\n= task_score per proposal" as TaskScore
+package "Stage 4: Task Scoring" {
+    component "Task Embedding Table\n(TaskEmb.py)\n14 x 128-D learned embeddings\nLookup by task_id" as TaskEmb
+    component "Task Score\n(TaskScore.py)\nDot product:\nproposal_feat . task_emb" as TaskScore
 }
 
-package "Stage 5 — Fused NMS" {
-    component "Fused NMS\n(FusedNms.py)\n\nfused = conf × task_score × prior[class][task]\nDivision-free IoU suppression\nOutputs top-K results" as FusedNMS
+package "Stage 5: Fused NMS" {
+    component "Fused NMS\n(FusedNms.py)\nfused = conf x task_score x prior\nDivision-free IoU suppression\nOutputs top-K results" as FusedNMS
 }
 
-database "Weights" {
-    [yolov5nu.pt] as YoloWeights
-    [SamIp.pth] as SamWeights
-    [TaskEmbeddings.npy\n14 x 128] as EmbWeights
-    [ClassTaskPrior.npy\n80 x 14] as PriorTable
-    [SamThresholds.npy\nper-task thresholds] as SamThresh
+database "Pretrained Weights" {
+    component "yolov5nu.pt" as YoloWeights
+    component "SamIp.pth" as SamWeights
+    component "TaskEmbeddings.npy\n14 x 128" as EmbWeights
+    component "ClassTaskPrior.npy\n80 x 14" as PriorTable
+    component "SamThresholds\nper-task float" as SamThresh
 }
 
 package "Output" {
-    [Top-1 Detection:\n{bbox, class, confidence, task}] as Output
+    component "Top-1 Detection\n{bbox, class, confidence, task}" as Output
 }
 
-' Main flow.
+' Main data flow.
 User --> Image
 User --> TaskId
 Image --> Preproc
 TaskId --> Preproc
 Preproc --> PrepSam
 Preproc --> PrepYolo
-
 PrepYolo --> YOLO
 PrepSam --> SAMIP
-
 YOLO --> SoftGate
 SAMIP --> SoftGate
-
 SoftGate --> RoI
 PrepYolo --> RoI
-
 RoI --> TaskScore
 TaskId --> TaskEmb
 TaskEmb --> TaskScore
-
 TaskScore --> FusedNMS
 SoftGate --> FusedNMS
 PriorTable --> FusedNMS
-
 FusedNMS --> Output
 
-' Weight loading.
-YoloWeights .down.> YOLO
-SamWeights .down.> SAMIP
-EmbWeights .down.> TaskEmb
-SamThresh .down.> SAMIP
+' Weight loading (dashed).
+YoloWeights ..> YOLO
+SamWeights ..> SAMIP
+EmbWeights ..> TaskEmb
+SamThresh ..> SAMIP
 
 note right of SoftGate
   Novel Contribution 1.
-  Keeps all proposals alive.
-  Attenuates irrelevant ones.
+  All proposals are preserved.
+  Off-mask ones are attenuated only.
 end note
 
 note right of FusedNMS
   Novel Contribution 2.
-  Three-way fusion before suppression.
-  Ranks wine glass over kite
+  Three-way score fusion before NMS.
+  Surfaces wine glass over kite
   for task: Serve Wine.
 end note
 
 note bottom of YOLO
-  Anchor-based detection chosen
-  intentionally over YOLO v8/v11/v26
-  (NMS-Free models are incompatible
-  with the Fused NMS architecture).
+  YOLOv5n is chosen over v8, v11, v26.
+  Newer NMS-Free models suppress proposals
+  internally, breaking the Fused NMS stage.
 end note
 
 @enduml
