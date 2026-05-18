@@ -2,6 +2,8 @@
 
 This document serves as a comprehensive directory mapping for the entire project. It outlines the purpose and function of each module within the repository.
 
+![TACTILE Stage 2A architecture diagram.](Visuals/TactileStage2AArchitectureDiagram.png)
+
 ## Root Directory Scripts:
 
 These scripts handle top level execution and orchestration tasks.

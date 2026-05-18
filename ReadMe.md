@@ -11,6 +11,8 @@ The core of the system evaluates user intent before engaging deep detection netw
 * Task scoring computes a localized match against stored embeddings.
 * Final results are filtered using a division free intersection over union algorithm.
 
+![TACTILE Stage 2A architecture diagram.](Visuals/TactileStage2AArchitectureDiagram.png)
+
 ## Performance Metrics:
 
 The hyperparameter optimization successfully discovered the optimal weights for the spatial attention map. The current implementation achieves a validation recall of 99.92 percent. Standard inference overhead adds less than 4 milliseconds to the base detector execution time. The pipeline is structurally validated against hardware equivalents. 
