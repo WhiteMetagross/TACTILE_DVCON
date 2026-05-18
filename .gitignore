@@ -1,6 +1,9 @@
 # Dataset files (too large, downloaded via SetupDataset.py)
 CocoTaskDataset/
 
+# Design contest context documents (local reference only)
+DVCON_Stage2A_Context/
+
 # Generated inference output cache
 output/
 
