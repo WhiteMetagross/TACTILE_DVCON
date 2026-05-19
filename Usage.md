@@ -2,14 +2,24 @@
 
 This document details the operational instructions for the Task Aware Cascaded Inference pipeline. The system includes several scripts for training, evaluation, and demonstration purposes. All scripts must be executed from the project root directory.
 
-## Running The Demonstration:
+## Running The Interactive CLI:
 
-The demonstration script processes a single image and outputs the task relevant detections. It also generates a visual overlay.
-* Execute the Demo.py script.
+The interactive CLI provides a user-friendly interface to test the pipeline dynamically.
+* Execute `python Cli.py`.
+* Select an inference task from the displayed list.
+* Input a corresponding Image ID (e.g., `8211`) or press `m` to manually enter a path.
+* The script will visualize the object detection output directly via OpenCV and save it to the output directory.
+
+## Running The Programmatic Demonstration:
+
+The `Demo.py` script processes a single image programmatically without interactive prompts.
+* Execute the `Demo.py` script.
 * Provide the path to the target image using the image argument.
 * Specify the numerical identifier for the desired task using the task argument.
 * Define the output destination using the output argument.
 * The script will process the image and save the result to the specified location.
+
+*A recorded walkthrough is also provided in the repository as `CompressedDemo.mp4`.*
 
 ## Generating Task Embeddings:
 

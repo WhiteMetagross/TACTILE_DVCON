@@ -13,9 +13,11 @@ The project utilizes Conda for environment isolation. You must prepare the virtu
 
 The codebase requires specific machine learning and computer vision libraries. 
 * Install the PyTorch library tailored for your computational hardware.
-* Install the OpenCV library for image processing.
+* Install the OpenCV library for image processing (`opencv-python`).
 * Install the Ultralytics library to access the base detector model.
 * Install Optuna for running hyperparameter optimization tasks.
+
+*Note: For WSL users intending to use the interactive CLI (`Cli.py`), ensure WSLg is functioning properly for `cv2.imshow` windows. A fallback font directory config is provided in the script to suppress Qt errors.*
 
 ## Dataset Configuration:
 
